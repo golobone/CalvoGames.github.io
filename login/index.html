@@ -3,32 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registro - Calvo Games</title>
+<title>Login - Calvo Games</title>
 <style>
-body { font-family: Arial; background:#1e1e1e; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
-.box { background:#2c2c2c; padding:30px; border-radius:12px; width:320px; text-align:center; }
-input { width:90%; padding:10px; margin:8px 0; border-radius:6px; border:none; }
-button { width:95%; padding:10px; margin:10px 0; border-radius:6px; border:none; background:#ff9800; color:#fff; font-weight:bold; cursor:pointer; }
-button:hover { background:#e68a00; }
-#status { font-size:0.9em; color:#ccc; }
-a { color:#ff9800; text-decoration:none; display:block; margin-top:10px; }
+body {
+  font-family: Arial;
+  background:#1e1e1e;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  margin:0;
+  flex-direction: column;
+}
+.box {
+  background:#2c2c2c;
+  padding:30px;
+  border-radius:12px;
+  width:320px;
+  text-align:center;
+}
+input {
+  width:90%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+  border:none;
+}
+button {
+  width:95%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:6px;
+  border:none;
+  background:#ff9800;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+  transition: all 0.2s ease;
+}
+button.active {
+  transform: scale(1.1);
+  background:#e68a00;
+}
+#status {
+  font-size:1em;
+  margin-top:15px;
+  padding:10px;
+  border-radius:6px;
+}
+.error {
+  background: #ff4c4c;
+  color: #fff;
+  font-weight:bold;
+}
+.success {
+  background: #4caf50;
+  color: #fff;
+  font-weight:bold;
+}
+a {
+  color:#ff9800;
+  text-decoration:none;
+  display:block;
+  margin-top:10px;
+}
 </style>
 </head>
 <body>
 
 <div class="box">
-<h2>Registro</h2>
-<input type="text" id="name" placeholder="Nombre">
+<h2>Iniciar sesión</h2>
 <input type="email" id="email" placeholder="Correo">
 <input type="password" id="password" placeholder="Contraseña">
-<button id="registerBtn" type="button">Registrarse</button>
+<button id="loginBtn" type="button">Iniciar sesión</button>
 <p id="status">No hay sesión iniciada</p>
-<a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
+<a href="/register">¿No tienes cuenta? Regístrate</a>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
@@ -42,24 +97,38 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+
+const btn = document.getElementById('loginBtn');
 const status = document.getElementById('status');
 
-document.addEventListener('DOMContentLoaded', () => {
-  const registerBtn = document.getElementById('registerBtn');
-  registerBtn.addEventListener('click', () => {
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value;
-    const pass = document.getElementById('password').value;
+btn.addEventListener('click', async () => {
+  btn.classList.add('active');
+  setTimeout(() => btn.classList.remove('active'), 300);
 
-    if(!name){ status.textContent = "Debes ingresar un nombre"; return; }
+  const email = document.getElementById('email').value.trim();
+  const pass = document.getElementById('password').value.trim();
 
-    createUserWithEmailAndPassword(auth, email, pass)
-      .then(userCredential => {
-        updateProfile(userCredential.user, { displayName: name })
-          .then(()=> { window.location.href="/index.html"; });
-      })
-      .catch(error => { status.textContent = "Error: " + error.message; });
-  });
+  if(!email || !pass){
+    status.textContent = "Todos los campos son obligatorios.";
+    status.className = "error";
+    return;
+  }
+
+  status.textContent = "Iniciando sesión...";
+  status.className = "";
+
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    status.textContent = "¡Sesión iniciada correctamente! Redirigiendo...";
+    status.className = "success";
+    setTimeout(() => {
+      window.location.href = "/calvogames/index.html";
+    }, 1500);
+  } catch(error) {
+    status.textContent = error.message;
+    status.className = "error";
+    console.error(error);
+  }
 });
 </script>
 
