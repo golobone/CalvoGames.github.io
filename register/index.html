@@ -5,69 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Registro - Calvo Games</title>
 <style>
-body {
-  font-family: Arial;
-  background:#1e1e1e;
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  margin:0;
-  flex-direction: column;
-}
-.box {
-  background:#2c2c2c;
-  padding:30px;
-  border-radius:12px;
-  width:320px;
-  text-align:center;
-}
-input {
-  width:90%;
-  padding:10px;
-  margin:8px 0;
-  border-radius:6px;
-  border:none;
-}
-button {
-  width:95%;
-  padding:10px;
-  margin:10px 0;
-  border-radius:6px;
-  border:none;
-  background:#ff9800;
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-  transition: all 0.2s ease;
-}
-button.active {
-  transform: scale(1.1);
-  background:#e68a00;
-}
-#status {
-  font-size:1em;
-  margin-top:15px;
-  padding:10px;
-  border-radius:6px;
-}
-.error {
-  background: #ff4c4c;
-  color: #fff;
-  font-weight:bold;
-}
-.success {
-  background: #4caf50;
-  color: #fff;
-  font-weight:bold;
-}
-a {
-  color:#ff9800;
-  text-decoration:none;
-  display:block;
-  margin-top:10px;
-}
+body { font-family: Arial; background:#1e1e1e; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; flex-direction: column; }
+.box { background:#2c2c2c; padding:30px; border-radius:12px; width:320px; text-align:center; }
+input { width:90%; padding:10px; margin:8px 0; border-radius:6px; border:none; }
+button { width:95%; padding:10px; margin:10px 0; border-radius:6px; border:none; background:#ff9800; color:#fff; font-weight:bold; cursor:pointer; transition: all 0.2s ease; }
+button.active { transform: scale(1.1); background:#e68a00; }
+#status { font-size:1em; margin-top:15px; padding:10px; border-radius:6px; }
+.error { background: #ff4c4c; color: #fff; font-weight:bold; }
+.success { background: #4caf50; color: #fff; font-weight:bold; }
+a { color:#ff9800; text-decoration:none; display:block; margin-top:10px; }
 </style>
 </head>
 <body>
@@ -82,10 +28,10 @@ a {
 <a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
 </div>
 
-<!-- Firebase Modular SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
@@ -99,12 +45,12 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 const btn = document.getElementById('registerBtn');
 const status = document.getElementById('status');
 
-btn.addEventListener('click', () => {
-  // Animación del botón
+btn.addEventListener('click', async () => {
   btn.classList.add('active');
   setTimeout(() => btn.classList.remove('active'), 300);
 
@@ -112,7 +58,7 @@ btn.addEventListener('click', () => {
   const email = document.getElementById('email').value.trim();
   const pass = document.getElementById('password').value.trim();
 
-  if (!name || !email || !pass) {
+  if(!name || !email || !pass){
     status.textContent = "Todos los campos son obligatorios.";
     status.className = "error";
     return;
@@ -121,18 +67,24 @@ btn.addEventListener('click', () => {
   status.textContent = "Registrando usuario...";
   status.className = "";
 
-  createUserWithEmailAndPassword(auth, email, pass)
-    .then(userCredential => updateProfile(userCredential.user, { displayName: name }))
-    .then(() => {
-      status.textContent = "¡Usuario registrado correctamente! Redirigiendo...";
-      status.className = "success";
-      setTimeout(() => window.location.href = "/index.html", 1500);
-    })
-    .catch(error => {
-      status.textContent = error.message;
-      status.className = "error";
-      console.error(error);
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(userCredential.user, { displayName: name });
+    await setDoc(doc(db, "users", userCredential.user.uid), {
+      name: name,
+      email: email,
+      createdAt: new Date()
     });
+
+    status.textContent = "¡Usuario registrado correctamente! Redirigiendo...";
+    status.className = "success";
+    setTimeout(() => window.location.href = "/calvogames/index.html", 1500);
+
+  } catch (error) {
+    status.textContent = error.message;
+    status.className = "error";
+    console.error(error);
+  }
 });
 </script>
 
