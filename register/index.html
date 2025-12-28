@@ -10,7 +10,7 @@ body { font-family: Arial; background:#1e1e1e; color:#fff; display:flex; justify
 input { width:90%; padding:10px; margin:8px 0; border-radius:6px; border:none; }
 button { width:95%; padding:10px; margin:10px 0; border-radius:6px; border:none; background:#ff9800; color:#fff; font-weight:bold; cursor:pointer; }
 button:hover { background:#e68a00; }
-#status { font-size:0.9em; color:#ccc; }
+#status { font-size:0.9em; color:#ccc; margin-top:10px; }
 a { color:#ff9800; text-decoration:none; display:block; margin-top:10px; }
 </style>
 </head>
@@ -47,20 +47,29 @@ const status = document.getElementById('status');
 
 document.getElementById('registerBtn').addEventListener('click', () => {
   const name = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value;
-  const pass = document.getElementById('password').value;
+  const email = document.getElementById('email').value.trim();
+  const pass = document.getElementById('password').value.trim();
 
-  if(!name){ status.textContent = "Debes ingresar un nombre"; return; }
+  if(!name || !email || !pass){
+    status.textContent = "Todos los campos son obligatorios.";
+    return;
+  }
+
+  status.textContent = "Registrando usuario...";
 
   auth.createUserWithEmailAndPassword(email, pass)
     .then(userCredential => {
       return userCredential.user.updateProfile({ displayName: name });
     })
     .then(() => {
-      window.location.href = "/index.html";
+      status.textContent = "¡Usuario registrado correctamente! Redirigiendo...";
+      setTimeout(() => {
+        window.location.href = "/index.html"; // puedes poner ruta absoluta
+      }, 1500);
     })
     .catch(error => {
       status.textContent = "Error: " + error.message;
+      console.error(error); // así ves el error en consola
     });
 });
 </script>
