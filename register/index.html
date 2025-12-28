@@ -26,10 +26,11 @@ a { color:#ff9800; text-decoration:none; display:block; margin-top:10px; }
 <a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
+<!-- Firebase UMD -->
+<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
 
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
   authDomain: "calvogames-v1.firebaseapp.com",
@@ -40,29 +41,27 @@ const firebaseConfig = {
   measurementId: "G-334HNXG644"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 const status = document.getElementById('status');
 
-document.addEventListener('DOMContentLoaded', () => {
-  const registerBtn = document.getElementById('registerBtn');
+document.getElementById('registerBtn').addEventListener('click', () => {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('password').value;
 
-  registerBtn.addEventListener('click', async () => {
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value;
-    const pass = document.getElementById('password').value;
+  if(!name){ status.textContent = "Debes ingresar un nombre"; return; }
 
-    if(!name){ status.textContent = "Debes ingresar un nombre"; return; }
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-      await updateProfile(userCredential.user, { displayName: name });
-      status.textContent = "Registro exitoso: " + name;
-      window.location.href = "/index.html"; // Redirige a la página principal
-    } catch(error) {
+  auth.createUserWithEmailAndPassword(email, pass)
+    .then(userCredential => {
+      return userCredential.user.updateProfile({ displayName: name });
+    })
+    .then(() => {
+      window.location.href = "/index.html";
+    })
+    .catch(error => {
       status.textContent = "Error: " + error.message;
-    }
-  });
+    });
 });
 </script>
 
