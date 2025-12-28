@@ -2,32 +2,24 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Calvo Games</title>
     <style>
-        :root { --primary: #ff9800; --bg: #1e1e1e; --card: #2c2c2c; }
-        body { font-family: 'Segoe UI', Arial; background: var(--bg); color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: var(--card); padding: 40px; border-radius: 16px; width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        h2 { margin-bottom: 20px; color: var(--primary); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #3d3d3d; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; margin: 20px 0 10px; border-radius: 8px; border: none; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:hover { background: #e68a00; transform: translateY(-2px); }
-        .status { min-height: 20px; font-size: 14px; padding: 10px; border-radius: 6px; display: none; }
-        .error { display: block; background: #ff4c4c; color: white; }
-        .success { display: block; background: #4caf50; color: white; }
-        a { color: var(--primary); text-decoration: none; font-size: 14px; }
+        body { font-family: sans-serif; background: #1a1a1a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #252525; padding: 2rem; border-radius: 10px; width: 300px; text-align: center; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; background: #333; color: white; }
+        button { width: 100%; padding: 10px; background: #ff9800; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        #msg { margin-top: 10px; }
+        .err { color: #ff5555; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>Iniciar Sesión</h2>
-        <input type="email" id="email" placeholder="Tu Correo">
-        <input type="password" id="password" placeholder="Tu Contraseña">
-        <button id="loginBtn">Entrar</button>
-        <p id="status" class="status"></p>
-        <a href="../register/index.html">¿No tienes cuenta? Regístrate gratis</a>
-        <br>
-        <a href="../index.html" style="opacity: 0.6;">Seguir como invitado</a>
+    <div class="card">
+        <h2>Entrar</h2>
+        <input type="email" id="log-email" placeholder="Correo">
+        <input type="password" id="log-pass" placeholder="Contraseña">
+        <button id="btn-log">Iniciar Sesión</button>
+        <div id="msg"></div>
+        <p><a href="../register/index.html" style="color: #ff9800; text-decoration: none;">Crear una cuenta</a></p>
     </div>
 
     <script type="module">
@@ -38,39 +30,24 @@
             apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
             authDomain: "calvogames-v1.firebaseapp.com",
             projectId: "calvogames-v1",
-            storageBucket: "calvogames-v1.firebasestorage.app",
-            messagingSenderId: "490748488828",
             appId: "1:490748488828:web:eb32857a4e203ce33b6df9"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        const btn = document.getElementById('loginBtn');
-        const status = document.getElementById('status');
-
-        btn.addEventListener('click', async () => {
-            const email = document.getElementById('email').value.trim();
-            const pass = document.getElementById('password').value;
-
-            if(!email || !pass) {
-                showMsg("Ingresa tus credenciales", "error");
-                return;
-            }
+        document.getElementById('btn-log').onclick = async () => {
+            const email = document.getElementById('log-email').value;
+            const pass = document.getElementById('log-pass').value;
+            const msg = document.getElementById('msg');
 
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
-                showMsg("¡Bienvenido de nuevo!", "success");
-                setTimeout(() => window.location.href = "../index.html", 1500);
-            } catch (error) {
-                showMsg("Correo o contraseña incorrectos", "error");
+                window.location.href = "/index.html"; 
+            } catch (e) {
+                msg.innerHTML = "<span class='err'>Datos incorrectos</span>";
             }
-        });
-
-        function showMsg(txt, type) {
-            status.textContent = txt;
-            status.className = `status ${type}`;
-        }
+        };
     </script>
 </body>
 </html>
