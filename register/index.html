@@ -3,74 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registro - Calvo Games</title>
+<title>Prueba Botón</title>
 <style>
-body { font-family: Arial; background:#1e1e1e; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
-.box { background:#2c2c2c; padding:30px; border-radius:12px; width:320px; text-align:center; }
-input { width:90%; padding:10px; margin:8px 0; border-radius:6px; border:none; }
-button { width:95%; padding:10px; margin:10px 0; border-radius:6px; border:none; background:#ff9800; color:#fff; font-weight:bold; cursor:pointer; }
-button:hover { background:#e68a00; }
-#status { font-size:0.9em; color:#ccc; margin-top:10px; }
-a { color:#ff9800; text-decoration:none; display:block; margin-top:10px; }
+body { font-family: Arial; background:#1e1e1e; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; flex-direction: column; }
+button { padding:15px 30px; border:none; border-radius:8px; background:#ff9800; color:#fff; font-weight:bold; cursor:pointer; transition: all 0.2s ease; }
+button.active { transform: scale(1.2); background:#e68a00; }
+#status { margin-top:20px; }
 </style>
 </head>
 <body>
 
-<div class="box">
-<h2>Registro</h2>
-<input type="text" id="name" placeholder="Nombre">
-<input type="email" id="email" placeholder="Correo">
-<input type="password" id="password" placeholder="Contraseña">
-<button id="registerBtn" type="button">Registrarse</button>
-<p id="status">No hay sesión iniciada</p>
-<a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
-</div>
-
-<!-- Firebase UMD -->
-<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+<button id="testBtn" type="button">Pulsa aquí</button>
+<p id="status">Botón inactivo</p>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
-  authDomain: "calvogames-v1.firebaseapp.com",
-  projectId: "calvogames-v1",
-  storageBucket: "calvogames-v1.firebasestorage.app",
-  messagingSenderId: "490748488828",
-  appId: "1:490748488828:web:eb32857a4e203ce33b6df9",
-  measurementId: "G-334HNXG644"
-};
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('testBtn');
+  const status = document.getElementById('status');
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const status = document.getElementById('status');
+  btn.addEventListener('click', () => {
+    status.textContent = "¡Botón pulsado! ✅";
 
-document.getElementById('registerBtn').addEventListener('click', () => {
-  const name = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const pass = document.getElementById('password').value.trim();
-
-  if(!name || !email || !pass){
-    status.textContent = "Todos los campos son obligatorios.";
-    return;
-  }
-
-  status.textContent = "Registrando usuario...";
-
-  auth.createUserWithEmailAndPassword(email, pass)
-    .then(userCredential => {
-      return userCredential.user.updateProfile({ displayName: name });
-    })
-    .then(() => {
-      status.textContent = "¡Usuario registrado correctamente! Redirigiendo...";
-      setTimeout(() => {
-        window.location.href = "/index.html"; // puedes poner ruta absoluta
-      }, 1500);
-    })
-    .catch(error => {
-      status.textContent = "Error: " + error.message;
-      console.error(error); // así ves el error en consola
-    });
+    // Animación: agregar clase activa y quitarla después
+    btn.classList.add('active');
+    setTimeout(() => {
+      btn.classList.remove('active');
+    }, 300);
+  });
 });
 </script>
 
