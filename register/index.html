@@ -1,92 +1,96 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registro - Calvo Games</title>
-<style>
-body { font-family: Arial; background:#1e1e1e; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; flex-direction: column; }
-.box { background:#2c2c2c; padding:30px; border-radius:12px; width:320px; text-align:center; }
-input { width:90%; padding:10px; margin:8px 0; border-radius:6px; border:none; }
-button { width:95%; padding:10px; margin:10px 0; border-radius:6px; border:none; background:#ff9800; color:#fff; font-weight:bold; cursor:pointer; transition: all 0.2s ease; }
-button.active { transform: scale(1.1); background:#e68a00; }
-#status { font-size:1em; margin-top:15px; padding:10px; border-radius:6px; }
-.error { background: #ff4c4c; color: #fff; font-weight:bold; }
-.success { background: #4caf50; color: #fff; font-weight:bold; }
-a { color:#ff9800; text-decoration:none; display:block; margin-top:10px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Calvo Games</title>
+    <style>
+        :root { --primary: #ff9800; --bg: #1e1e1e; --card: #2c2c2c; }
+        body { font-family: 'Segoe UI', Arial; background: var(--bg); color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: var(--card); padding: 40px; border-radius: 16px; width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h2 { margin-bottom: 20px; color: var(--primary); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #3d3d3d; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin: 20px 0 10px; border-radius: 8px; border: none; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #e68a00; transform: translateY(-2px); }
+        .status { min-height: 20px; font-size: 14px; padding: 10px; border-radius: 6px; display: none; }
+        .error { display: block; background: #ff4c4c; color: white; }
+        .success { display: block; background: #4caf50; color: white; }
+        a { color: var(--primary); text-decoration: none; font-size: 14px; }
+        .loader { display: none; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
+    <div class="box">
+        <h2>Crear Cuenta</h2>
+        <input type="text" id="name" placeholder="Tu Nombre de Jugador">
+        <input type="email" id="email" placeholder="Correo Electrónico">
+        <input type="password" id="password" placeholder="Contraseña (mín. 6 caracteres)">
+        <button id="registerBtn">Registrarse Ahora</button>
+        <div id="loader" class="loader"></div>
+        <p id="status" class="status"></p>
+        <a href="../login/index.html">¿Ya tienes cuenta? Inicia sesión</a>
+        <br>
+        <a href="../index.html" style="opacity: 0.6;">Volver a la web sin registro</a>
+    </div>
 
-<div class="box">
-<h2>Registro</h2>
-<input type="text" id="name" placeholder="Nombre">
-<input type="email" id="email" placeholder="Correo">
-<input type="password" id="password" placeholder="Contraseña">
-<button id="registerBtn" type="button">Registrarse</button>
-<p id="status">No hay sesión iniciada</p>
-<a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
-</div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js";
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
+            authDomain: "calvogames-v1.firebaseapp.com",
+            projectId: "calvogames-v1",
+            storageBucket: "calvogames-v1.firebasestorage.app",
+            messagingSenderId: "490748488828",
+            appId: "1:490748488828:web:eb32857a4e203ce33b6df9"
+        };
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
-  authDomain: "calvogames-v1.firebaseapp.com",
-  projectId: "calvogames-v1",
-  storageBucket: "calvogames-v1.firebasestorage.app",
-  messagingSenderId: "490748488828",
-  appId: "1:490748488828:web:eb32857a4e203ce33b6df9",
-  measurementId: "G-334HNXG644"
-};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+        const btn = document.getElementById('registerBtn');
+        const status = document.getElementById('status');
+        const loader = document.getElementById('loader');
 
-const btn = document.getElementById('registerBtn');
-const status = document.getElementById('status');
+        btn.addEventListener('click', async () => {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const pass = document.getElementById('password').value;
 
-btn.addEventListener('click', async () => {
-  btn.classList.add('active');
-  setTimeout(() => btn.classList.remove('active'), 300);
+            if(!name || !email || !pass) {
+                showMsg("Rellena todos los campos", "error");
+                return;
+            }
 
-  const name = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const pass = document.getElementById('password').value.trim();
+            btn.style.display = 'none';
+            loader.style.display = 'block';
 
-  if(!name || !email || !pass){
-    status.textContent = "Todos los campos son obligatorios.";
-    status.className = "error";
-    return;
-  }
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                await updateProfile(userCredential.user, { displayName: name });
+                await setDoc(doc(db, "users", userCredential.user.uid), {
+                    name: name,
+                    email: email,
+                    createdAt: new Date()
+                });
 
-  status.textContent = "Registrando usuario...";
-  status.className = "";
+                showMsg("¡Cuenta creada! Entrando...", "success");
+                setTimeout(() => window.location.href = "../index.html", 1500);
+            } catch (error) {
+                btn.style.display = 'block';
+                loader.style.display = 'none';
+                showMsg(error.message, "error");
+            }
+        });
 
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(userCredential.user, { displayName: name });
-    await setDoc(doc(db, "users", userCredential.user.uid), {
-      name: name,
-      email: email,
-      createdAt: new Date()
-    });
-
-    status.textContent = "¡Usuario registrado correctamente! Redirigiendo...";
-    status.className = "success";
-    setTimeout(() => window.location.href = "/calvogames/index.html", 1500);
-
-  } catch (error) {
-    status.textContent = error.message;
-    status.className = "error";
-    console.error(error);
-  }
-});
-</script>
-
+        function showMsg(txt, type) {
+            status.textContent = txt;
+            status.className = `status ${type}`;
+        }
+    </script>
 </body>
 </html>
