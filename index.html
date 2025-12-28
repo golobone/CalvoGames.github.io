@@ -342,8 +342,18 @@ img.ProseMirror-separator {
                 cgAuth.signOut().then(() => window.location.href = "/index.html");
             };
 
-            if (user.email && MY_ADMINS.includes(user.email.toLowerCase())) {
-                panelBtn.style.display = "block";
+// SUSTITUYE LA PARTE DE VERIFICACIÓN DE ADMIN EN TU INDEX.HTML POR ESTA:
+cgAuth.onAuthStateChanged((user) => {
+    if (user) {
+        // Buscamos el rol en Firestore
+        cgApp.firestore().collection("users").doc(user.uid).get().then((doc) => {
+            if (doc.exists && doc.data().rol === "admin") {
+                document.getElementById('btn-admin-panel-cg').style.display = "block";
+            }
+        });
+        // ... el resto de tu código de nombre y logout ...
+    }
+});
             }
         } else {
             letra.innerText = "?";
