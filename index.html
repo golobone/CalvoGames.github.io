@@ -186,70 +186,6 @@ img.ProseMirror-separator {
         box-shadow: 0 0px 0px #143a16;
     }
 <style>
-    /* Recuperar el favicon si se perdió */
-    head { display: none; } 
-
-    #perfil-flotante-cg {
-        position: fixed; top: 20px; right: 20px;
-        background: rgba(15, 15, 15, 0.85); 
-        padding: 10px 16px;
-        border-radius: 16px; 
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        display: flex; align-items: center; gap: 14px;
-        z-index: 99999; 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        font-family: 'Inter', system-ui, sans-serif;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-    }
-
-    .avatar-circulo-cg {
-        width: 40px; height: 40px; 
-        background: #333;
-        color: white; border-radius: 12px;
-        display: flex; justify-content: center; align-items: center;
-        font-weight: 600; font-size: 18px; cursor: pointer;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255,255,255,0.05);
-    }
-    
-    .avatar-info-cg { display: flex; flex-direction: column; justify-content: center; }
-    
-    .avatar-nombre-cg { 
-        color: #efefef; font-size: 13px; font-weight: 600; 
-        margin-bottom: 2px; letter-spacing: 0.3px;
-    }
-
-    .btn-sesion-cg { 
-        color: #888; font-size: 11px; cursor: pointer; 
-        text-decoration: none; transition: 0.2s; 
-    }
-    .btn-sesion-cg:hover { color: #ff4444; }
-
-    /* BOTÓN ADMIN MINIMALISTA Y ELEGANTE */
-    #btn-admin-panel-cg {
-        display: none; 
-        background: rgba(46, 204, 113, 0.15);
-        color: #2ecc71 !important;
-        padding: 5px 10px;
-        border-radius: 6px;
-        font-size: 10px;
-        margin-top: 6px;
-        text-decoration: none;
-        font-weight: 700;
-        text-align: center;
-        border: 1px solid rgba(46, 204, 113, 0.3);
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        transition: all 0.2s ease;
-    }
-
-    #btn-admin-panel-cg:hover {
-        background: #2ecc71;
-        color: #000 !important;
-        box-shadow: 0 0 15px rgba(46, 204, 113, 0.4);
-    }
-<style>
     #perfil-flotante-cg {
         position: fixed; top: 15px; right: 15px;
         background: rgba(30, 30, 30, 0.95); padding: 8px 15px;
@@ -259,37 +195,25 @@ img.ProseMirror-separator {
         font-family: sans-serif;
     }
     .avatar-circulo-cg {
-        width: 38px; height: 38px; background: #555;
-        color: white; border-radius: 50%;
+        width: 38px; height: 38px; border-radius: 50%;
         display: flex; justify-content: center; align-items: center;
-        font-weight: bold; font-size: 20px; cursor: pointer;
+        font-weight: bold; font-size: 18px; color: white; cursor: pointer;
     }
     .avatar-info-cg { display: flex; flex-direction: column; }
-    .avatar-nombre-cg { color: #fff; font-size: 14px; font-weight: 600; line-height: 1.2; }
-    .btn-sesion-cg { color: #ff9800; font-size: 11px; cursor: pointer; text-decoration: none; font-weight: bold; }
-
-    /* --- REMODELACIÓN DEL BOTÓN ADMIN --- */
+    .avatar-nombre-cg { color: #fff; font-size: 13px; font-weight: 600; }
+    
+    /* BOTÓN ADMIN REMODELADO */
     #btn-admin-panel-cg {
-        display: none; 
-        margin-top: 5px;
-        padding: 4px 10px;
-        font-size: 10px;
-        font-weight: bold;
-        text-transform: uppercase;
-        text-decoration: none;
-        color: #2ecc71 !important; /* Verde Neón */
-        border: 1px solid #2ecc71;
-        border-radius: 4px;
-        text-align: center;
-        transition: all 0.3s ease;
-        background: transparent;
+        display: none; margin-top: 4px; padding: 3px 8px;
+        font-size: 9px; font-weight: bold; text-transform: uppercase;
+        text-decoration: none; border-radius: 4px; text-align: center;
     }
+    /* Estilo para OWNER (Verde) */
+    .btn-owner { color: #2ecc71 !important; border: 1px solid #2ecc71; }
+    /* Estilo para ADMIN (Rojo) */
+    .btn-admin { color: #e74c3c !important; border: 1px solid #e74c3c; }
 
-    #btn-admin-panel-cg:hover {
-        background: #2ecc71;
-        color: #1a1a1a !important;
-        box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
-    }
+    .btn-sesion-cg { color: #ff9800; font-size: 11px; cursor: pointer; text-decoration: none; font-weight: bold; }
 </style>
 
 <div id="perfil-flotante-cg">
@@ -305,15 +229,10 @@ img.ProseMirror-separator {
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
 (function() {
-    // Esto recupera el icono si se ha borrado en el head
-    const favicon = document.querySelector("link[rel*='icon']") || document.createElement('link');
-    favicon.rel = 'icon';
-    favicon.href = '/CalvoGames_files/favicon.ico';
-    document.head.appendChild(favicon);
-
     const cgConfig = {
         apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
         authDomain: "calvogames-v1.firebaseapp.com",
@@ -323,7 +242,8 @@ img.ProseMirror-separator {
 
     let cgApp = !firebase.apps.length ? firebase.initializeApp(cgConfig) : firebase.app();
     const cgAuth = cgApp.auth();
-    const MY_ADMINS = ["keray.mendez@gmail.com"];
+    const cgDb = firebase.firestore();
+    const MASTER = "keray.mendez@gmail.com";
 
     cgAuth.onAuthStateChanged((user) => {
         const letra = document.getElementById('cg-user-letra');
@@ -332,28 +252,26 @@ img.ProseMirror-separator {
         const panelBtn = document.getElementById('btn-admin-panel-cg');
 
         if (user) {
-            const dName = user.displayName || "Usuario";
-            letra.innerText = dName.charAt(0).toUpperCase();
-            letra.style.background = "#ff9800"; // Tu naranja clásico
-            nombre.innerText = dName;
-            container.innerHTML = '<span class="btn-sesion-cg" id="cg-logout" style="color:#ff5555">Cerrar Sesión</span>';
+            nombre.innerText = user.displayName || "Usuario";
+            letra.innerText = (user.displayName || "U").charAt(0).toUpperCase();
+            letra.style.background = "#ff9800";
+            container.innerHTML = '<span class="btn-sesion-cg" id="cg-logout" style="color:#aaa">Cerrar Sesión</span>';
             
-            document.getElementById('cg-logout').onclick = () => {
-                cgAuth.signOut().then(() => window.location.href = "/index.html");
-            };
+            document.getElementById('cg-logout').onclick = () => cgAuth.signOut().then(() => location.reload());
 
-// SUSTITUYE LA PARTE DE VERIFICACIÓN DE ADMIN EN TU INDEX.HTML POR ESTA:
-cgAuth.onAuthStateChanged((user) => {
-    if (user) {
-        // Buscamos el rol en Firestore
-        cgApp.firestore().collection("users").doc(user.uid).get().then((doc) => {
-            if (doc.exists && doc.data().rol === "admin") {
-                document.getElementById('btn-admin-panel-cg').style.display = "block";
-            }
-        });
-        // ... el resto de tu código de nombre y logout ...
-    }
-});
+            // LÓGICA DE RANGOS PARA EL BOTÓN
+            if (user.email === MASTER) {
+                panelBtn.style.display = "block";
+                panelBtn.className = "btn-owner"; // Botón Verde
+                panelBtn.innerText = "⚙️ OWNER PANEL";
+            } else {
+                cgDb.collection("users").doc(user.uid).get().then((doc) => {
+                    if (doc.exists && doc.data().rol === "admin") {
+                        panelBtn.style.display = "block";
+                        panelBtn.className = "btn-admin"; // Botón Rojo
+                        panelBtn.innerText = "⚙️ ADMIN PANEL";
+                    }
+                });
             }
         } else {
             letra.innerText = "?";
