@@ -249,17 +249,57 @@ img.ProseMirror-separator {
         color: #000 !important;
         box-shadow: 0 0 15px rgba(46, 204, 113, 0.4);
     }
+<style>
+    #perfil-flotante-cg {
+        position: fixed; top: 15px; right: 15px;
+        background: rgba(30, 30, 30, 0.95); padding: 8px 15px;
+        border-radius: 50px; border: 1px solid #444;
+        display: flex; align-items: center; gap: 12px;
+        z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        font-family: sans-serif;
+    }
+    .avatar-circulo-cg {
+        width: 38px; height: 38px; background: #555;
+        color: white; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        font-weight: bold; font-size: 20px; cursor: pointer;
+    }
+    .avatar-info-cg { display: flex; flex-direction: column; }
+    .avatar-nombre-cg { color: #fff; font-size: 14px; font-weight: 600; line-height: 1.2; }
+    .btn-sesion-cg { color: #ff9800; font-size: 11px; cursor: pointer; text-decoration: none; font-weight: bold; }
+
+    /* --- REMODELACIÓN DEL BOTÓN ADMIN --- */
+    #btn-admin-panel-cg {
+        display: none; 
+        margin-top: 5px;
+        padding: 4px 10px;
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: #2ecc71 !important; /* Verde Neón */
+        border: 1px solid #2ecc71;
+        border-radius: 4px;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: transparent;
+    }
+
+    #btn-admin-panel-cg:hover {
+        background: #2ecc71;
+        color: #1a1a1a !important;
+        box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+    }
 </style>
 
 <div id="perfil-flotante-cg">
     <div class="avatar-circulo-cg" id="cg-user-letra" onclick="window.location.href='/login/index.html'">?</div>
-    
     <div class="avatar-info-cg">
         <span class="avatar-nombre-cg" id="cg-user-name">Invitado</span>
         <div id="cg-auth-container">
-            <a href="/login/index.html" class="btn-sesion-cg" style="color:#2ecc71">Entrar</a>
+            <a href="/login/index.html" class="btn-sesion-cg">Iniciar Sesión</a>
         </div>
-        <a href="/admin/dashboard.html" id="btn-admin-panel-cg">Panel Admin</a>
+        <a href="/admin/dashboard.html" id="btn-admin-panel-cg">⚙️ PANEL CONTROL</a>
     </div>
 </div>
 
@@ -268,11 +308,11 @@ img.ProseMirror-separator {
 
 <script>
 (function() {
-    // Restaurar Favicon dinámicamente
-    const link = document.createElement('link');
-    link.rel = 'icon';
-    link.href = '/CalvoGames_files/favicon.ico';
-    document.head.appendChild(link);
+    // Esto recupera el icono si se ha borrado en el head
+    const favicon = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.href = '/CalvoGames_files/favicon.ico';
+    document.head.appendChild(favicon);
 
     const cgConfig = {
         apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
@@ -294,11 +334,9 @@ img.ProseMirror-separator {
         if (user) {
             const dName = user.displayName || "Usuario";
             letra.innerText = dName.charAt(0).toUpperCase();
-            letra.style.background = "#2ecc71";
-            letra.style.color = "#000";
+            letra.style.background = "#ff9800"; // Tu naranja clásico
             nombre.innerText = dName;
-            
-            container.innerHTML = '<span class="btn-sesion-cg" id="cg-logout">Cerrar Sesión</span>';
+            container.innerHTML = '<span class="btn-sesion-cg" id="cg-logout" style="color:#ff5555">Cerrar Sesión</span>';
             
             document.getElementById('cg-logout').onclick = () => {
                 cgAuth.signOut().then(() => window.location.href = "/index.html");
@@ -309,11 +347,10 @@ img.ProseMirror-separator {
             }
         } else {
             letra.innerText = "?";
-            letra.style.background = "#333";
-            letra.style.color = "#fff";
+            letra.style.background = "#555";
             nombre.innerText = "Invitado";
             panelBtn.style.display = "none";
-            container.innerHTML = '<a href="/login/index.html" class="btn-sesion-cg" style="color:#2ecc71">Entrar</a>';
+            container.innerHTML = '<a href="/login/index.html" class="btn-sesion-cg">Iniciar Sesión</a>';
         }
     });
 })();
