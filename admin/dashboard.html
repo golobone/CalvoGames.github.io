@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control | Calvo Games</title>
+    <link rel="icon" href="/CalvoGames_files/favicon.ico" type="image/x-icon">
+    
+    <style>
+        body {
+            background-color: #121212;
+            color: #eee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 { margin: 0; color: #ff9800; font-size: 24px; }
+
+        .btn-volver {
+            text-decoration: none;
+            color: #ccc;
+            font-size: 14px;
+            padding: 8px 15px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .btn-volver:hover { background: #333; color: #fff; }
+
+        /* Tarjetas de Resumen */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .card h3 { margin: 0; font-size: 32px; color: #2ecc71; }
+        .card p { margin: 5px 0 0; color: #888; text-transform: uppercase; font-size: 12px; }
+
+        /* Tabla de Usuarios */
+        .table-container {
+            background: #1e1e1e;
+            border-radius: 10px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: #252525;
+            padding: 15px;
+            color: #ff9800;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            font-size: 14px;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(255, 152, 0, 0.05); }
+
+        .loading { padding: 40px; text-align: center; color: #888; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>⚙️ PANEL DE ADMINISTRACIÓN</h1>
+        <a href="/index.html" class="btn-volver">← Volver a la Web</a>
+    </header>
+
+    <div class="stats">
+        <div class="card">
+            <h3 id="total-users">--</h3>
+            <p>Usuarios Registrados</p>
+        </div>
+        </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre de Usuario</th>
+                    <th>Correo Electrónico</th>
+                    <th>Fecha Registro</th>
+                </tr>
+            </thead>
+            <tbody id="user-list">
+                <tr>
+                    <td colspan="3" class="loading">Cargando base de datos...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+    // Configuración (La misma que usas en toda la web)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
+        authDomain: "calvogames-v1.firebaseapp.com",
+        projectId: "calvogames-v1",
+        appId: "1:490748488828:web:eb32857a4e203ce33b6df9"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Seguridad: Verificar si el usuario es Keray antes de mostrar nada
+    auth.onAuthStateChanged((user) => {
+        if (!user || user.email !== "keray.mendez@gmail.com") {
+            alert("Acceso denegado. No eres administrador.");
+            window.location.href = "/index.html";
+        } else {
+            cargarUsuarios();
+        }
+    });
+
+    function cargarUsuarios() {
+        const userList = document.getElementById('user-list');
+        const totalUsers = document.getElementById('total-users');
+
+        db.collection("users").orderBy("createdAt", "desc").get().then((querySnapshot) => {
+            userList.innerHTML = ""; // Limpiar mensaje de carga
+            totalUsers.innerText = querySnapshot.size;
+
+            if (querySnapshot.empty) {
+                userList.innerHTML = '<tr><td colspan="3" class="loading">No hay usuarios registrados aún.</td></tr>';
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const fecha = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : "---";
+                
+                const row = `
+                    <tr>
+                        <td style="font-weight: bold; color: #fff;">${data.username || 'Sin nombre'}</td>
+                        <td>${data.email}</td>
+                        <td style="color: #888;">${fecha}</td>
+                    </tr>
+                `;
+                userList.innerHTML += row;
+            });
+        }).catch((error) => {
+            console.error("Error cargando usuarios: ", error);
+            userList.innerHTML = '<tr><td colspan="3" class="loading" style="color:red;">Error al leer la base de datos. Revisa las reglas de Firestore.</td></tr>';
+        });
+    }
+</script>
+
+</body>
+</html>
