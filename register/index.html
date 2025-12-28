@@ -1,85 +1,71 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Registro - Calvo Games</title>
-    <style>
-        body { background: #1a1a1a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #252525; padding: 30px; border-radius: 10px; width: 300px; text-align: center; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #444; background: #333; color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #ff9800; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
-        button:active { transform: scale(0.98); }
-        #status { margin-top: 15px; font-size: 13px; color: #ff9800; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 4px; }
-    </style>
-</head>
-<body>
+<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
 
-    <div class="card">
-        <h2>Crear Cuenta</h2>
-        <input type="text" id="name" placeholder="Nombre de usuario">
-        <input type="email" id="email" placeholder="Correo electrónico">
-        <input type="password" id="password" placeholder="Contraseña">
-        <button id="registerBtn">Registrarse</button>
-        <div id="status">Listo para registrar</div>
-    </div>
+<script>
+    // 2. Tu configuración
+    const firebaseConfig = {
+        apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
+        authDomain: "calvogames-v1.firebaseapp.com",
+        projectId: "calvogames-v1",
+        storageBucket: "calvogames-v1.firebasestorage.app",
+        messagingSenderId: "490748488828",
+        appId: "1:490748488828:web:eb32857a4e203ce33b6df9"
+    };
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js";
+    // 3. Inicializar Firebase (Versión Compat)
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-        // CONFIGURACIÓN (Verifica que sea la tuya)
-        const firebaseConfig = {
-            apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
-            authDomain: "calvogames-v1.firebaseapp.com",
-            projectId: "calvogames-v1",
-            storageBucket: "calvogames-v1.firebasestorage.app",
-            messagingSenderId: "490748488828",
-            appId: "1:490748488828:web:eb32857a4e203ce33b6df9"
-        };
+    // 4. Lógica del botón
+    const btn = document.getElementById('registerBtn');
+    const statusMsg = document.getElementById('status');
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    btn.onclick = async function() {
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const pass = document.getElementById('password').value.trim();
 
-        // Referencia al botón
-        const btn = document.getElementById('registerBtn');
-        const statusMsg = document.getElementById('status');
+        if (!name || !email || !pass) {
+            statusMsg.innerText = "❌ Rellena todos los campos";
+            return;
+        }
 
-        btn.addEventListener('click', async () => {
-            console.log("Botón presionado..."); // ESTO DEBE SALIR EN F12
+        statusMsg.innerText = "⏳ Registrando en Firebase...";
+        console.log("Enviando datos...");
+
+        try {
+            // Crear usuario
+            const userCred = await auth.createUserWithEmailAndPassword(email, pass);
             
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const pass = document.getElementById('password').value.trim();
+            // Guardar nombre en el perfil
+            await userCred.user.updateProfile({ displayName: name });
 
-            if (!name || !email || !pass) {
-                statusMsg.innerText = "❌ Faltan datos";
-                return;
+            // Guardar en la base de datos
+            await db.collection("users").doc(userCred.user.uid).set({
+                username: name,
+                email: email,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            statusMsg.innerText = "✅ ¡CONSEGUIDO! Redirigiendo...";
+            setTimeout(() => {
+                window.location.href = "../index.html";
+            }, 2000);
+
+        } catch (error) {
+            console.error("Error detallado:", error);
+            
+            // Mensajes de error amigables
+            if (error.code === 'auth/email-already-in-use') {
+                statusMsg.innerText = "❌ Este correo ya tiene cuenta.";
+            } else if (error.code === 'auth/weak-password') {
+                statusMsg.innerText = "❌ La contraseña es muy corta.";
+            } else {
+                statusMsg.innerText = "❌ Error: " + error.message;
             }
+        }
+    };
+</script>
 
-            statusMsg.innerText = "⏳ Conectando con Firebase...";
-
-            try {
-                const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-                console.log("Usuario creado en Auth");
-
-                await updateProfile(userCred.user, { displayName: name });
-                
-                await setDoc(doc(db, "users", userCred.user.uid), {
-                    username: name,
-                    email: email,
-                    createdAt: new Date()
-                });
-
-                statusMsg.innerText = "✅ ¡Registrado! Redirigiendo...";
-                setTimeout(() => window.location.href = "../index.html", 2000);
-
-            } catch (error) {
-                console.error("ERROR DETECTADO:", error.code);
-                statusMsg.innerText = "Error: " + error.message;
-            }
-        });
-    </script>
-</body>
-</html>
