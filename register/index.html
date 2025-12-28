@@ -5,13 +5,70 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Registro - Calvo Games</title>
 <style>
-body { font-family: Arial; background:#1e1e1e; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; flex-direction: column; }
-.box { background:#2c2c2c; padding:30px; border-radius:12px; width:320px; text-align:center; }
-input { width:90%; padding:10px; margin:8px 0; border-radius:6px; border:none; }
-button { width:95%; padding:10px; margin:10px 0; border-radius:6px; border:none; background:#ff9800; color:#fff; font-weight:bold; cursor:pointer; transition: all 0.2s ease; }
-button.active { transform: scale(1.1); background:#e68a00; }
-#status { font-size:0.9em; color:#ccc; margin-top:10px; }
-a { color:#ff9800; text-decoration:none; display:block; margin-top:10px; }
+body {
+  font-family: Arial; 
+  background:#1e1e1e; 
+  color:#fff; 
+  display:flex; 
+  justify-content:center; 
+  align-items:center; 
+  height:100vh; 
+  margin:0; 
+  flex-direction: column;
+}
+.box {
+  background:#2c2c2c; 
+  padding:30px; 
+  border-radius:12px; 
+  width:320px; 
+  text-align:center;
+  position: relative;
+}
+input {
+  width:90%; 
+  padding:10px; 
+  margin:8px 0; 
+  border-radius:6px; 
+  border:none;
+}
+button {
+  width:95%; 
+  padding:10px; 
+  margin:10px 0; 
+  border-radius:6px; 
+  border:none; 
+  background:#ff9800; 
+  color:#fff; 
+  font-weight:bold; 
+  cursor:pointer; 
+  transition: all 0.2s ease;
+}
+button.active {
+  transform: scale(1.1); 
+  background:#e68a00;
+}
+#status {
+  font-size:1em; 
+  margin-top:15px; 
+  padding:10px; 
+  border-radius:6px;
+}
+.error {
+  background: #ff4c4c; 
+  color: #fff;
+  font-weight:bold;
+}
+.success {
+  background: #4caf50; 
+  color: #fff;
+  font-weight:bold;
+}
+a {
+  color:#ff9800; 
+  text-decoration:none; 
+  display:block; 
+  margin-top:10px;
+}
 </style>
 </head>
 <body>
@@ -43,8 +100,8 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const status = document.getElementById('status');
 const btn = document.getElementById('registerBtn');
+const status = document.getElementById('status');
 
 btn.addEventListener('click', () => {
   // Animación de botón
@@ -55,23 +112,29 @@ btn.addEventListener('click', () => {
   const email = document.getElementById('email').value.trim();
   const pass = document.getElementById('password').value.trim();
 
+  // Validación básica
   if(!name || !email || !pass){
     status.textContent = "Todos los campos son obligatorios.";
+    status.className = "error";
     return;
   }
 
   status.textContent = "Registrando usuario...";
+  status.className = "";
 
   auth.createUserWithEmailAndPassword(email, pass)
     .then(userCredential => {
+      // Guardar nombre
       return userCredential.user.updateProfile({ displayName: name });
     })
     .then(() => {
       status.textContent = "¡Usuario registrado correctamente! Redirigiendo...";
+      status.className = "success";
       setTimeout(() => { window.location.href = "/index.html"; }, 1500);
     })
     .catch(error => {
-      status.textContent = "Error: " + error.message;
+      status.textContent = error.message; // Mensaje grande y visible
+      status.className = "error";
       console.error(error);
     });
 });
