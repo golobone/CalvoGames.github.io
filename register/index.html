@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calvo Games - Registro</title>
+<title>Registro - Calvo Games</title>
 <style>
 body { font-family: Arial; background:#1e1e1e; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
 .box { background:#2c2c2c; padding:30px; border-radius:12px; width:320px; text-align:center; }
@@ -17,13 +17,13 @@ a { color:#ff9800; text-decoration:none; display:block; margin-top:10px; }
 <body>
 
 <div class="box">
-  <h2>Registro</h2>
-  <input type="text" id="name" placeholder="Nombre">
-  <input type="email" id="email" placeholder="Correo">
-  <input type="password" id="password" placeholder="Contraseña">
-  <button onclick="register()">Registrarse</button>
-  <p id="status">No hay sesión iniciada</p>
-  <a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
+<h2>Registro</h2>
+<input type="text" id="name" placeholder="Nombre">
+<input type="email" id="email" placeholder="Correo">
+<input type="password" id="password" placeholder="Contraseña">
+<button id="registerBtn" type="button">Registrarse</button>
+<p id="status">No hay sesión iniciada</p>
+<a href="/login">¿Ya tienes cuenta? Inicia sesión</a>
 </div>
 
 <script type="module">
@@ -44,22 +44,26 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const status = document.getElementById('status');
 
-window.register = () => {
-  const name = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value;
-  const pass = document.getElementById('password').value;
+document.addEventListener('DOMContentLoaded', () => {
+  const registerBtn = document.getElementById('registerBtn');
 
-  if(!name) { status.textContent = "Debes ingresar un nombre"; return; }
+  registerBtn.addEventListener('click', async () => {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('password').value;
 
-  createUserWithEmailAndPassword(auth, email, pass)
-    .then(userCredential => {
-      updateProfile(userCredential.user, { displayName: name })
-        .then(()=> {
-          window.location.href = "/index.html"; // redirige a principal
-        });
-    })
-    .catch(error => { status.textContent = "Error: " + error.message; });
-};
+    if(!name){ status.textContent = "Debes ingresar un nombre"; return; }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(userCredential.user, { displayName: name });
+      status.textContent = "Registro exitoso: " + name;
+      window.location.href = "/index.html"; // Redirige a la página principal
+    } catch(error) {
+      status.textContent = "Error: " + error.message;
+    }
+  });
+});
 </script>
 
 </body>
