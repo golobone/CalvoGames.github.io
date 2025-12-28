@@ -1,74 +1,47 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Registro - Calvo Games</title>
-    <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #252525; padding: 2rem; border-radius: 10px; width: 300px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; background: #333; color: white; }
-        button { width: 100%; padding: 10px; background: #ff9800; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
-        #msg { margin-top: 10px; font-size: 14px; }
-        .err { color: #ff5555; }
-        .ok { color: #55ff55; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h2>Crear Cuenta</h2>
-        <input type="text" id="reg-name" placeholder="Nombre de usuario">
-        <input type="email" id="reg-email" placeholder="Correo electrónico">
-        <input type="password" id="reg-pass" placeholder="Contraseña">
-        <button id="btn-reg">Registrarse</button>
-        <div id="msg"></div>
-        <p><a href="../login/index.html" style="color: #ff9800; text-decoration: none;">¿Ya tienes cuenta?</a></p>
-    </div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js";
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js";
+    const firebaseConfig = {
+        apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
+        authDomain: "calvogames-v1.firebaseapp.com",
+        projectId: "calvogames-v1",
+        storageBucket: "calvogames-v1.firebasestorage.app",
+        messagingSenderId: "490748488828",
+        appId: "1:490748488828:web:eb32857a4e203ce33b6df9"
+    };
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAqprLLzZIfM2WnJsHISksgraZ2NJnQnRw",
-            authDomain: "calvogames-v1.firebaseapp.com",
-            projectId: "calvogames-v1",
-            storageBucket: "calvogames-v1.firebasestorage.app",
-            messagingSenderId: "490748488828",
-            appId: "1:490748488828:web:eb32857a4e203ce33b6df9"
-        };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    document.getElementById('registerBtn').onclick = async () => {
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+        const status = document.getElementById('status');
 
-        document.getElementById('btn-reg').onclick = async () => {
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-            const msg = document.getElementById('msg');
+        try {
+            // CREAR USUARIO
+            const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+            
+            // GUARDAR NOMBRE EN EL PERFIL
+            await updateProfile(userCredential.user, { displayName: name });
 
-            try {
-                // 1. Crea el usuario en Firebase Auth
-                const res = await createUserWithEmailAndPassword(auth, email, pass);
-                
-                // 2. Le pone el nombre al perfil
-                await updateProfile(res.user, { displayName: name });
+            // GUARDAR EN LA BASE DE DATOS (Lo que acabas de crear)
+            await setDoc(doc(db, "users", userCredential.user.uid), {
+                nombre: name,
+                correo: email,
+                fecha: new Date()
+            });
 
-                // 3. Guarda los datos en la base de datos Firestore
-                await setDoc(doc(db, "users", res.user.uid), {
-                    username: name,
-                    email: email,
-                    created: new Date()
-                });
+            status.innerText = "¡Registrado con éxito! Redirigiendo...";
+            setTimeout(() => window.location.href = "../index.html", 2000);
 
-                msg.innerHTML = "<span class='ok'>¡Éxito! Redirigiendo...</span>";
-                setTimeout(() => window.location.href = "/index.html", 2000);
-
-            } catch (e) {
-                msg.innerHTML = `<span class='err'>${e.message}</span>`;
-            }
-        };
-    </script>
-</body>
-</html>
+        } catch (error) {
+            console.error("Error completo:", error);
+            status.innerText = "Error: " + error.message;
+        }
+    };
+</script>
