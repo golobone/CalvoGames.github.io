@@ -35,7 +35,7 @@ git push origin main --quiet
 
 echo.
 echo ===========================================
-echo       ¡TODO LISTO! CAMBIOS SUBIDOS
+echo        TODO LISTO! CAMBIOS SUBIDOS
 echo ===========================================
 echo.
 pause
