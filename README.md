@@ -8,6 +8,7 @@ Esta es la plataforma de **Calvo Games**. Un sitio para jugar a lo que voy subie
 
 ## 👥 Equipo
 Proyecto desarrollado con la ayuda de:
+* **Yeray**
 * **Karim**
 * **Moha**
 * **Mario**
