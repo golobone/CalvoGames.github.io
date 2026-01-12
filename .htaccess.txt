@@ -1,2 +1,0 @@
-Redirect 301 / https://calvogames.pages.dev
-
