@@ -7,6 +7,7 @@
     
     <meta name="description" content="CalvoGames es una web de juegos indie y proyectos en desarrollo con descargas directas y próximos lanzamientos.">
     <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    
     <meta property="og:title" content="CalvoGames">
     <meta property="og:description" content="Juegos indie en desarrollo con descarga directa y próximos lanzamientos.">
     <meta property="og:image" content="/preview.png">
@@ -38,10 +39,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // Tu lógica de negocio intacta
         const OWNER_EMAIL = "calvoonyt@gmail.com"; 
 
-        // INICIALIZACIÓN: Aquí debes pegar tu bloque firebaseConfig y firebase.initializeApp(firebaseConfig);
+        // INICIALIZACIÓN: Pega tu bloque firebaseConfig aquí.
+        // firebase.initializeApp(firebaseConfig);
 
         const cgAuth = firebase.auth();
         const cgDb = firebase.firestore();
@@ -60,7 +61,6 @@
                 
                 document.getElementById('cg-logout').onclick = () => cgAuth.signOut().then(() => location.reload());
 
-                // Lógica de rangos original
                 if (user.email === OWNER_EMAIL) {
                     panelBtn.style.display = "block";
                     panelBtn.className = "btn-owner-cg"; 
@@ -83,7 +83,5 @@
             }
         });
     </script>
-
-    <script src="./Calvo Games_files/main-64a32274863b6c59.js.descarga" defer></script>
 </body>
 </html>
