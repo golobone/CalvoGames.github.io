@@ -14,23 +14,23 @@
     <meta property="og:type" content="website">
 
     <style>
-        .btn-owner-cg { background: #4caf50; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold; }
-        .btn-admin-cg { background: #f44336; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold; }
-        .btn-sesion-cg { cursor: pointer; font-size: 0.9em; }
-        #user-avatar { width: 35px; height: 35px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: white; margin-right: 8px; }
+        body { font-family: sans-serif; background-color: #1a1a1a; color: white; margin: 0; }
+        #cg-auth-container { display: flex; align-items: center; padding: 15px; background: #252525; border-bottom: 1px solid #333; }
+        #user-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 12px; }
+        .btn-owner-cg { background: #4caf50; color: white; padding: 8px 12px; border-radius: 4px; font-weight: bold; border: none; margin-left: 15px; cursor: pointer; }
+        .btn-admin-cg { background: #f44336; color: white; padding: 8px 12px; border-radius: 4px; font-weight: bold; border: none; margin-left: 15px; cursor: pointer; }
+        .btn-sesion-cg { cursor: pointer; color: #aaa; text-decoration: underline; font-size: 0.9em; }
     </style>
 </head>
 <body>
 
-    <div id="cg-auth-container" style="display: flex; align-items: center; padding: 10px; background: #222; color: white;">
+    <div id="cg-auth-container">
         <div id="user-avatar">?</div>
         <div>
-            <span id="cg-user-name">Invitado</span>
-            <div id="session-action">
-                <a href="login/" style="color: #aaa; text-decoration: none;">Iniciar Sesión</a>
-            </div>
+            <span id="cg-user-name">Cargando...</span>
+            <div id="session-action"></div>
         </div>
-        <button id="panel-btn" style="display: none; margin-left: 15px; border: none; cursor: pointer;"></button>
+        <button id="panel-btn" style="display: none;"></button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
@@ -38,11 +38,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // Tu lógica de autenticación original integrada
+        // Tu lógica de negocio intacta
         const OWNER_EMAIL = "calvoonyt@gmail.com"; 
 
-        // Inicializa aquí tu Firebase con tus credenciales
-        // firebase.initializeApp(firebaseConfig);
+        // INICIALIZACIÓN: Aquí debes pegar tu bloque firebaseConfig y firebase.initializeApp(firebaseConfig);
 
         const cgAuth = firebase.auth();
         const cgDb = firebase.firestore();
@@ -57,12 +56,11 @@
                 nombre.innerText = user.displayName || "Usuario";
                 letra.innerText = (user.displayName || "U").charAt(0).toUpperCase();
                 letra.style.background = "#ff9800";
-                
-                container.innerHTML = '<span class="btn-sesion-cg" id="cg-logout" style="color:#aaa">Cerrar Sesión</span>';
+                container.innerHTML = '<span class="btn-sesion-cg" id="cg-logout">Cerrar Sesión</span>';
                 
                 document.getElementById('cg-logout').onclick = () => cgAuth.signOut().then(() => location.reload());
 
-                // Lógica de rangos (Owner/Admin)
+                // Lógica de rangos original
                 if (user.email === OWNER_EMAIL) {
                     panelBtn.style.display = "block";
                     panelBtn.className = "btn-owner-cg"; 
@@ -86,6 +84,6 @@
         });
     </script>
 
-    <script src="./Calvo Games_files/main-64a32274863b6c59.js.descarga" defer=""></script>
+    <script src="./Calvo Games_files/main-64a32274863b6c59.js.descarga" defer></script>
 </body>
 </html>
