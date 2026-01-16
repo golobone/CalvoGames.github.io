@@ -1,3 +1,0 @@
-RewriteEngine On
-RewriteCond %{HTTP_HOST} !^calvogames\.pages\.dev$ [NC]
-RewriteRule ^(.*)$ https://calvogames.pages.dev/$1 [L,R=301]
