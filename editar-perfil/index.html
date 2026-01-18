@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Perfil | MiServer</title>
+    <style>
+        :root {
+            --primary: #ff9800;
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #ffffff;
+            --input-bg: #2a2a2a;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container-editar {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        h2 { margin-bottom: 25px; font-weight: 600; }
+
+        /* Contenedor de la previsualización */
+        .preview-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+        }
+
+        .avatar-preview {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            overflow: hidden;
+            border: 3px solid var(--primary);
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        /* Diseño de Inputs */
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 8px;
+            margin-left: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background: var(--input-bg);
+            color: white;
+            box-sizing: border-box;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus { border-color: var(--primary); }
+
+        input[type="file"] {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        /* Botones */
+        .btn-guardar {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-guardar:hover {
+            background: #e68900;
+            transform: translateY(-2px);
+        }
+
+        .btn-volver {
+            display: inline-block;
+            margin-top: 20px;
+            color: #777;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-volver:hover { color: var(--text); }
+    </style>
+</head>
+<body>
+
+<div class="container-editar">
+    <h2>Editar Perfil</h2>
+
+    <form action="/actualizar-perfil" method="POST" enctype="multipart/form-data">
+        
+        <div class="preview-container">
+            <div class="avatar-preview" id="preview-box">
+                <span id="preview-letra">G</span>
+                <img id="preview-img" src="" alt="Vista previa">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Nombre de usuario</label>
+            <input type="text" name="username" id="input-name" placeholder="Ej: golobone" required>
+        </div>
+
+        <div class="form-group">
+            <label>Foto de perfil</label>
+            <input type="file" name="avatar" id="input-file" accept="image/*">
+        </div>
+
+        <button type="submit" class="btn-guardar">Guardar Cambios</button>
+    </form>
+
+    <a href="/" class="btn-volver">Cancelar y volver</a>
+</div>
+
+<script>
+    const inputName = document.getElementById('input-name');
+    const inputFile = document.getElementById('input-file');
+    const previewLetra = document.getElementById('preview-letra');
+    const previewImg = document.getElementById('preview-img');
+
+    // Cambiar la letra en tiempo real
+    inputName.addEventListener('input', (e) => {
+        if (previewImg.style.display !== 'block') {
+            const letra = e.target.value.charAt(0).toUpperCase() || '?';
+            previewLetra.innerText = letra;
+        }
+    });
+
+    // Previsualizar la imagen al seleccionarla
+    inputFile.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+                previewLetra.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+</body>
+</html>
