@@ -3,189 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración de Perfil | MiServer</title>
+    <title>Editar Perfil | Cloudflare Storage</title>
     <style>
-        :root {
-            --primary: #ff9800;
-            --bg: #121212;
-            --card-bg: #1e1e1e;
-            --text: #ffffff;
-            --input-bg: #2a2a2a;
+        body { background: #121212; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #1e1e1e; padding: 30px; border-radius: 15px; width: 320px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+        
+        .preview-box { 
+            width: 90px; height: 90px; border-radius: 50%; background: #ff9800; 
+            margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; 
+            overflow: hidden; font-size: 35px; font-weight: bold; border: 3px solid #333;
         }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .container-editar {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: 100%;
-            max-width: 350px;
-            text-align: center;
-        }
-
-        h2 { margin-bottom: 25px; font-weight: 600; }
-
-        /* Contenedor de la previsualización */
-        .preview-container {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 20px;
-        }
-
-        .avatar-preview {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            font-weight: bold;
-            overflow: hidden;
-            border: 3px solid var(--primary);
-        }
-
-        .avatar-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-
-        /* Diseño de Inputs */
-        .form-group {
-            text-align: left;
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            color: #aaa;
-            margin-bottom: 8px;
-            margin-left: 5px;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #444;
-            background: var(--input-bg);
-            color: white;
-            box-sizing: border-box;
-            outline: none;
-            transition: border 0.3s;
-        }
-
-        input[type="text"]:focus { border-color: var(--primary); }
-
-        input[type="file"] {
-            font-size: 12px;
-            color: #aaa;
-        }
-
-        /* Botones */
-        .btn-guardar {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px;
-            width: 100%;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 16px;
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        .btn-guardar:hover {
-            background: #e68900;
-            transform: translateY(-2px);
-        }
-
-        .btn-volver {
-            display: inline-block;
-            margin-top: 20px;
-            color: #777;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .btn-volver:hover { color: var(--text); }
+        input[type="text"] { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #2a2a2a; color: white; box-sizing: border-box; }
+        input[type="file"] { margin: 15px 0; font-size: 13px; color: #aaa; }
+        
+        .btn-save { background: #ff9800; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s; }
+        .btn-save:disabled { background: #555; cursor: not-allowed; }
+        .btn-back { display: block; margin-top: 15px; color: #888; text-decoration: none; font-size: 13px; }
     </style>
 </head>
 <body>
 
-<div class="container-editar">
-    <h2>Editar Perfil</h2>
+<div class="card">
+    <div class="preview-box" id="p-box">
+        <span id="p-letra">?</span>
+        <img id="p-img" src="">
+    </div>
 
-    <form action="/actualizar-perfil" method="POST" enctype="multipart/form-data">
+    <form id="uploadForm">
+        <label style="font-size: 12px; color: #888;">NOMBRE DE USUARIO</label>
+        <input type="text" id="nombre" placeholder="Escribe tu nombre..." required>
         
-        <div class="preview-container">
-            <div class="avatar-preview" id="preview-box">
-                <span id="preview-letra">G</span>
-                <img id="preview-img" src="" alt="Vista previa">
-            </div>
-        </div>
+        <label style="font-size: 12px; color: #888;">FOTO DE PERFIL</label>
+        <input type="file" id="foto" accept="image/*">
 
-        <div class="form-group">
-            <label>Nombre de usuario</label>
-            <input type="text" name="username" id="input-name" placeholder="Ej: golobone" required>
-        </div>
-
-        <div class="form-group">
-            <label>Foto de perfil</label>
-            <input type="file" name="avatar" id="input-file" accept="image/*">
-        </div>
-
-        <button type="submit" class="btn-guardar">Guardar Cambios</button>
+        <button type="submit" class="btn-save" id="btn">Guardar en Cloudflare</button>
     </form>
-
-    <a href="/" class="btn-volver">Cancelar y volver</a>
+    <a href="/" class="btn-back">Cancelar</a>
 </div>
 
 <script>
-    const inputName = document.getElementById('input-name');
-    const inputFile = document.getElementById('input-file');
-    const previewLetra = document.getElementById('preview-letra');
-    const previewImg = document.getElementById('preview-img');
+    const fotoInput = document.getElementById('foto');
+    const nombreInput = document.getElementById('nombre');
+    const pImg = document.getElementById('p-img');
+    const pLetra = document.getElementById('p-letra');
 
-    // Cambiar la letra en tiempo real
-    inputName.addEventListener('input', (e) => {
-        if (previewImg.style.display !== 'block') {
-            const letra = e.target.value.charAt(0).toUpperCase() || '?';
-            previewLetra.innerText = letra;
-        }
-    });
-
-    // Previsualizar la imagen al seleccionarla
-    inputFile.addEventListener('change', function() {
-        const file = this.files[0];
+    // Previsualización instantánea
+    fotoInput.onchange = () => {
+        const file = fotoInput.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImg.src = e.target.result;
-                previewImg.style.display = 'block';
-                previewLetra.style.display = 'none';
+            reader.onload = (e) => {
+                pImg.src = e.target.result;
+                pImg.style.display = 'block';
+                pLetra.style.display = 'none';
             }
             reader.readAsDataURL(file);
         }
-    });
-</script>
+    };
 
+    // Envío al Worker
+    document.getElementById('uploadForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn');
+        btn.innerText = "Subiendo...";
+        btn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('username', nombreInput.value);
+        formData.append('avatar', fotoInput.files[0]);
+
+        try {
+            // REEMPLAZA ESTO CON LA URL DE TU WORKER
+            const response = await fetch('https://tu-worker.workers.dev/update-profile', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                alert("Perfil actualizado correctamente");
+                window.location.href = "/"; // Volver a la principal
+            } else {
+                alert("Error al guardar datos");
+            }
+        } catch (err) {
+            alert("Error de conexión con Cloudflare");
+        } finally {
+            btn.innerText = "Guardar en Cloudflare";
+            btn.disabled = false;
+        }
+    };
+</script>
 </body>
 </html>
