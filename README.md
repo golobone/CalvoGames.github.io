@@ -23,7 +23,6 @@ Proyecto desarrollado con la ayuda de:
 * `/admin`: Gestión de comunidad.
 * `/login` y `/register`: Acceso.
 * `index.html`: Catálogo de juegos.
-* `perfil.html`: Ajustes de usuario.
 
 ---
 © 2025 Calvo Games.
